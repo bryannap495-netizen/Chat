@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bestie Chat 💗</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#fff1f7;color:#38243a}
+header{background:#ff69a6;color:white;padding:20px;text-align:center}
+main{max-width:600px;margin:auto;padding:15px}
+.card{background:white;border-radius:18px;padding:16px;margin-bottom:15px;box-shadow:0 3px 12px #e9bad033}
+input,button{font-size:16px;padding:12px;border-radius:12px}
+input{border:1px solid #edcddd;min-width:0}
+button{border:0;background:#ff69a6;color:white;cursor:pointer}
+button:active{opacity:.7}
+.row{display:flex;gap:8px;margin:8px 0}
+.row input{flex:1;width:50%}
+#messages{height:300px;overflow-y:auto;background:#fff8fc;padding:10px;border-radius:12px}
+.msg{background:#ffe0ef;padding:10px;margin:8px 0;border-radius:12px;overflow-wrap:anywhere}
+.mine{background:#ff69a6;color:white;text-align:right}
+small{color:#8c7082}
+</style>
+</head>
+<body>
+<header>
+  <h1>💗 Bestie Chat</h1>
+  <p>Your little friend group</p>
+</header>
+<main>
+  <section class="card">
+    <h3>👋 Your profile</h3>
+    <div class="row">
+      <input id="name" placeholder="Your name">
+      <button onclick="saveName()">Save</button>
+    </div>
+    <small id="profile">Choose a name to get started.</small>
+  </section>
+
+  <section class="card">
+    <h3>💬 Group messages</h3>
+    <div id="messages"></div>
+    <form class="row" id="form">
+      <input id="message" placeholder="Type a message..." required>
+      <button>Send</button>
+    </form>
+    <small>Messages on this version are saved only in this browser.</small>
+  </section>
+
+  <section class="card">
+    <h3>📞 Call your friends</h3>
+    <p>Allow microphone access to test your device.</p>
+    <div class="row">
+      <button onclick="startCall(false)">📞 Voice</button>
+      <button onclick="startCall(true)">🎥 Video</button>
+      <button onclick="stopCall()">Hang up</button>
+    </div>
+    <video id="preview" autoplay muted playsinline
+      style="display:none;width:100%;border-radius:12px"></video>
+    <p id="callStatus"><small>No active call.</small></p>
+  </section>
+</main>
+<script>
+let username=localStorage.getItem("bestie-name")||"Friend";
+let stream=null;
+const messages=document.getElementById("messages");
+
+document.getElementById("name").value=
+  username==="Friend"?"":username;
+document.getElementById("profile").textContent=
+  "Signed in as "+username;
+
+function saveName(){
+  username=document.getElementById("name").value.trim()||"Friend";
+  localStorage.setItem("bestie-name",username);
+  document.getElementById("profile").textContent=
+    "Signed in as "+username;
+}
+
+function renderMessage(m){
+  const div=document.createElement("div");
+  div.className="msg"+(m.name===username?" mine":"");
+  div.textContent=m.name+": "+m.text;
+  messages.appendChild(div);
+  messages.scrollTop=messages.scrollHeight;
+}
+
+let history=[];
+try{
+  history=JSON.parse(localStorage.getItem("bestie-messages")||"[]");
+}catch(e){history=[]}
+history.forEach(renderMessage);
+
+document.getElementById("form").addEventListener("submit",e=>{
+  e.preventDefault();
+  const input=document.getElementById("message");
+  const text=input.value.trim();
+  if(!text)return;
+  const m={name:username,text};
+  history.push(m);
+  try{
+    localStorage.setItem("bestie-messages",JSON.stringify(history));
+  }catch(e){}
+  renderMessage(m);
+  input.value="";
+});
+
+async function startCall(video){
+  try{
+    stopCall();
+    stream=await navigator.mediaDevices.getUserMedia({
+      audio:true,video:video
+    });
+    const preview=document.getElementById("preview");
+    if(video){
+      preview.srcObject=stream;
+      preview.style.display="block";
+    }
+    document.getElementById("callStatus").textContent=
+      "Your microphone"+(video?" and camera":"")+
+      " are ready. This is a local test, not a connected call.";
+  }catch(e){
+    document.getElementById("callStatus").textContent=
+      "Microphone/camera unavailable. Use HTTPS and allow access.";
+  }
+}
+
+function stopCall(){
+  if(stream)stream.getTracks().forEach(t=>t.stop());
+  stream=null;
+  const preview=document.getElementById("preview");
+  preview.srcObject=null;
+  preview.style.display="none";
+  document.getElementById("callStatus").textContent="No active call.";
+}
+</script>
+</body>
+</html>
