@@ -1,267 +1,1302 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MyChat - Free Video Calls</title>
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>MyChat 💚</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="https://meet.jit.si/external_api.js"></script>
 
 <style>
+
 * {
-    margin: 0;
-    padding: 0;
     box-sizing: border-box;
 }
 
 body {
+    margin: 0;
     font-family: Arial, sans-serif;
-    background: #101827;
+    background: #111b21;
     color: white;
+}
+
+/* LOGIN */
+
+#authScreen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     min-height: 100vh;
-}
-
-header {
-    background: #1d2939;
-    padding: 20px;
-    text-align: center;
-    border-bottom: 1px solid #344054;
-}
-
-header h1 {
-    color: #38bdf8;
-}
-
-.container {
-    max-width: 900px;
-    margin: 40px auto;
     padding: 20px;
 }
 
-.card {
-    background: #1d2939;
+.auth-box {
+    background: #202c33;
     padding: 30px;
     border-radius: 15px;
+    width: 100%;
+    max-width: 380px;
     text-align: center;
 }
 
-.card h2 {
-    margin-bottom: 15px;
-}
-
-.card p {
-    color: #98a2b3;
+.logo {
+    font-size: 35px;
+    color: #25d366;
     margin-bottom: 20px;
 }
 
 input {
     width: 100%;
-    padding: 15px;
-    border-radius: 8px;
+    padding: 14px;
+    margin: 8px 0;
     border: none;
-    margin-bottom: 15px;
-    font-size: 16px;
+    border-radius: 8px;
+    outline: none;
+    background: #2a3942;
+    color: white;
+    font-size: 15px;
+}
+
+input::placeholder {
+    color: #aaa;
 }
 
 button {
-    padding: 14px 25px;
     border: none;
-    border-radius: 8px;
-    background: #38bdf8;
-    color: #101827;
-    font-size: 16px;
-    font-weight: bold;
     cursor: pointer;
-    margin: 5px;
+    font-size: 15px;
 }
 
-button:hover {
-    background: #0ea5e9;
+.auth-btn {
+    background: #25d366;
+    color: #111;
+    width: 100%;
+    padding: 14px;
+    border-radius: 8px;
+    font-weight: bold;
+    margin-top: 12px;
 }
 
-.end-btn {
+.switch {
+    color: #25d366;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.error {
+    color: #ff7777;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+/* APP */
+
+#app {
+    display: none;
+    height: 100dvh;
+    width: 100%;
+}
+
+/* SIDEBAR */
+
+.sidebar {
+    width: 350px;
+    background: #111b21;
+    border-right: 1px solid #313d45;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    background: #202c33;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-header h2 {
+    margin: 0;
+    color: #25d366;
+}
+
+.logout {
+    background: #ff4444;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+.search-box {
+    padding: 12px;
+}
+
+#usersList {
+    overflow-y: auto;
+    flex: 1;
+}
+
+.user {
+    padding: 15px;
+    border-bottom: 1px solid #202c33;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    cursor: pointer;
+}
+
+.user:hover {
+    background: #202c33;
+}
+
+.avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: #25d366;
+    color: #111;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.user-info {
+    overflow: hidden;
+}
+
+.user-info strong {
+    display: block;
+}
+
+.user-info small {
+    color: #8696a0;
+}
+
+/* CHAT */
+
+.chat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #0b141a;
+    min-width: 0;
+}
+
+.chat-header {
+    background: #202c33;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 70px;
+}
+
+.chat-name {
+    flex: 1;
+    font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.call-btn {
+    background: transparent;
+    color: #25d366;
+    font-size: 24px;
+    padding: 8px;
+}
+
+#messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.message {
+    padding: 10px 13px;
+    border-radius: 9px;
+    max-width: 75%;
+    overflow-wrap: anywhere;
+    line-height: 1.4;
+    font-size: 15px;
+}
+
+.sent {
+    align-self: flex-end;
+    background: #005c4b;
+}
+
+.received {
+    align-self: flex-start;
+    background: #202c33;
+}
+
+.message-time {
+    color: #b0b0b0;
+    font-size: 10px;
+    text-align: right;
+    margin-top: 5px;
+}
+
+.message-input {
+    background: #202c33;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.message-input input {
+    flex: 1;
+    margin: 0;
+}
+
+.send-btn {
+    background: #25d366;
+    color: #111;
+    padding: 13px 18px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.empty-chat {
+    margin: auto;
+    text-align: center;
+    color: #8696a0;
+}
+
+.empty-chat h1 {
+    color: #25d366;
+}
+
+#backBtn {
+    display: none;
+    background: transparent;
+    color: white;
+    font-size: 25px;
+}
+
+/* CALL */
+
+#callScreen {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 100;
+    flex-direction: column;
+}
+
+#jitsiContainer {
+    flex: 1;
+    min-height: 0;
+}
+
+.call-bottom {
+    background: #202c33;
+    padding: 12px;
+    text-align: center;
+}
+
+.end-call {
     background: #ef4444;
     color: white;
+    padding: 13px 30px;
+    border-radius: 30px;
 }
 
-#meeting {
-    width: 100%;
-    height: 600px;
-    margin-top: 20px;
-    border-radius: 12px;
-    overflow: hidden;
-    display: none;
-}
+/* MOBILE */
 
-#callControls {
-    display: none;
-    text-align: center;
-    margin-top: 15px;
-}
+@media(max-width: 700px) {
 
-@media(max-width: 600px) {
-    #meeting {
-        height: 75vh;
+    .sidebar {
+        width: 100%;
     }
 
-    .container {
-        margin: 10px auto;
+    .chat {
+        display: none;
+        width: 100%;
     }
+
+    #app.chat-open .sidebar {
+        display: none;
+    }
+
+    #app.chat-open .chat {
+        display: flex;
+    }
+
+    #backBtn {
+        display: block;
+    }
+
+    .message {
+        max-width: 85%;
+    }
+
 }
+
 </style>
+
 </head>
 
 <body>
 
-<header>
-    <h1>💬 MyChat</h1>
-    <p>Free Voice & Video Calls</p>
-</header>
+<!-- AUTHENTICATION -->
 
-<div class="container">
+<div id="authScreen">
 
-    <div class="card" id="joinCard">
-        <h2>📞 Start or Join a Call</h2>
-        <p>Enter a room name to connect with friends.</p>
+<div class="auth-box">
 
-        <input
-            type="text"
-            id="username"
-            placeholder="Your name"
-        >
+<div class="logo">💬 MyChat</div>
 
-        <input
-            type="text"
-            id="roomName"
-            placeholder="Room name (example: friends123)"
-        >
+<h2 id="authTitle">Welcome Back</h2>
 
-        <button onclick="startCall()">
-            📹 Start Video Call
-        </button>
+<input
+id="username"
+placeholder="Choose username"
+style="display:none"
+maxlength="30"
+>
 
-        <button onclick="startAudioCall()">
-            🎤 Voice Call
-        </button>
-    </div>
+<input
+id="email"
+type="email"
+placeholder="Email address"
+>
 
-    <div id="meeting"></div>
+<input
+id="password"
+type="password"
+placeholder="Password"
+>
 
-    <div id="callControls">
-        <button onclick="copyLink()">
-            🔗 Copy Invite Link
-        </button>
+<button
+class="auth-btn"
+id="authButton"
+onclick="handleAuth()"
+>
+Login
+</button>
 
-        <button class="end-btn" onclick="endCall()">
-            ❌ End Call
-        </button>
-    </div>
+<p class="error" id="authError"></p>
+
+<p class="switch" onclick="toggleAuth()" id="switchText">
+Don't have an account? Sign Up
+</p>
 
 </div>
 
-<script src="https://meet.jit.si/external_api.js"></script>
+</div>
+
+
+<!-- MAIN APP -->
+
+<div id="app">
+
+<!-- USERS -->
+
+<div class="sidebar">
+
+<div class="sidebar-header">
+
+<h2>💬 MyChat</h2>
+
+<button class="logout" onclick="logout()">
+Logout
+</button>
+
+</div>
+
+<div class="search-box">
+
+<input
+id="searchUsers"
+placeholder="🔍 Search friends..."
+oninput="filterUsers()"
+>
+
+</div>
+
+<div id="usersList"></div>
+
+</div>
+
+
+<!-- CHAT -->
+
+<div class="chat">
+
+<div class="chat-header">
+
+<button id="backBtn" onclick="backToUsers()">
+←
+</button>
+
+<div class="avatar" id="chatAvatar">
+💚
+</div>
+
+<div class="chat-name" id="chatName">
+Select a friend
+</div>
+
+<button class="call-btn" onclick="startCall('voice')">
+📞
+</button>
+
+<button class="call-btn" onclick="startCall('video')">
+📹
+</button>
+
+</div>
+
+<div id="messages">
+
+<div class="empty-chat">
+
+<h1>💚 MyChat</h1>
+
+<p>Select a friend to start messaging.</p>
+
+</div>
+
+</div>
+
+<div class="message-input">
+
+<input
+id="messageText"
+placeholder="Type a message..."
+onkeydown="if(event.key==='Enter')sendMessage()"
+>
+
+<button class="send-btn" onclick="sendMessage()">
+➤
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- CALL SCREEN -->
+
+<div id="callScreen">
+
+<div id="jitsiContainer"></div>
+
+<div class="call-bottom">
+
+<button class="end-call" onclick="endCall()">
+📞 End Call
+</button>
+
+</div>
+
+</div>
+
 
 <script>
-let api;
-let currentRoom = "";
 
-const params = new URLSearchParams(window.location.search);
+/* =========================
+   SUPABASE CONFIGURATION
+========================= */
 
-if (params.has("room")) {
-    document.getElementById("roomName").value =
-        params.get("room");
+const SUPABASE_URL =
+"https://chuvzyhdclnyenswnkvw.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_Dgw29xJoQm_JHK5S3rQ5Ag_aZHtAnnk";
+
+const db = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+
+/* =========================
+   VARIABLES
+========================= */
+
+let currentUser = null;
+
+let selectedUser = null;
+
+let allUsers = [];
+
+let isSignup = false;
+
+let messageChannel = null;
+
+let jitsiApi = null;
+
+let chatVersion = 0;
+
+
+/* =========================
+   AUTH UI
+========================= */
+
+function toggleAuth() {
+
+    isSignup = !isSignup;
+
+    document.getElementById("username").style.display =
+        isSignup ? "block" : "none";
+
+    document.getElementById("authTitle").textContent =
+        isSignup ? "Create Account" : "Welcome Back";
+
+    document.getElementById("authButton").textContent =
+        isSignup ? "Sign Up" : "Login";
+
+    document.getElementById("switchText").textContent =
+        isSignup
+        ? "Already have an account? Login"
+        : "Don't have an account? Sign Up";
+
+    document.getElementById("authError").textContent = "";
+
 }
 
-function startCall() {
-    createMeeting(false);
-}
 
-function startAudioCall() {
-    createMeeting(true);
-}
+/* =========================
+   LOGIN / SIGNUP
+========================= */
 
-function createMeeting(audioOnly) {
+async function handleAuth() {
+
+    const email =
+        document.getElementById("email").value.trim();
+
+    const password =
+        document.getElementById("password").value;
 
     const username =
         document.getElementById("username").value.trim();
 
+    const errorBox =
+        document.getElementById("authError");
+
+    const button =
+        document.getElementById("authButton");
+
+    errorBox.textContent = "";
+
+    if (!email || !password) {
+
+        errorBox.textContent =
+            "Enter your email and password.";
+
+        return;
+    }
+
+    if (isSignup && !username) {
+
+        errorBox.textContent =
+            "Please choose a username.";
+
+        return;
+    }
+
+    button.disabled = true;
+
+    try {
+
+        if (isSignup) {
+
+            const { data, error } =
+                await db.auth.signUp({
+
+                    email: email,
+
+                    password: password,
+
+                    options: {
+                        data: {
+                            username: username
+                        }
+                    }
+
+                });
+
+            if (error) throw error;
+
+            if (!data.session) {
+
+                errorBox.style.color = "#25d366";
+
+                errorBox.textContent =
+                    "Account created! Check your email to confirm your account.";
+
+                return;
+            }
+
+        } else {
+
+            const { error } =
+                await db.auth.signInWithPassword({
+
+                    email: email,
+
+                    password: password
+
+                });
+
+            if (error) throw error;
+
+        }
+
+        const { data: { user } } =
+            await db.auth.getUser();
+
+        if (user) {
+            await openApp(user);
+        }
+
+    } catch (error) {
+
+        errorBox.style.color = "#ff7777";
+
+        errorBox.textContent = error.message;
+
+    } finally {
+
+        button.disabled = false;
+
+    }
+
+}
+
+
+/* =========================
+   OPEN APP
+========================= */
+
+async function openApp(user) {
+
+    currentUser = user;
+
+    document.getElementById("authScreen").style.display =
+        "none";
+
+    document.getElementById("app").style.display =
+        "flex";
+
+    await loadUsers();
+
+}
+
+
+/* =========================
+   LOAD USERS
+========================= */
+
+async function loadUsers() {
+
+    const { data, error } = await db
+        .from("profiles")
+        .select("id, username")
+        .neq("id", currentUser.id)
+        .order("username");
+
+    if (error) {
+
+        console.error(error);
+
+        alert("Could not load users: " + error.message);
+
+        return;
+    }
+
+    allUsers = data || [];
+
+    filterUsers();
+
+}
+
+
+/* =========================
+   SEARCH USERS
+========================= */
+
+function filterUsers() {
+
+    const search =
+        document.getElementById("searchUsers")
+        .value.toLowerCase();
+
+    const filtered = allUsers.filter(user =>
+        user.username.toLowerCase().includes(search)
+    );
+
+    const list =
+        document.getElementById("usersList");
+
+    list.innerHTML = "";
+
+    if (filtered.length === 0) {
+
+        const empty = document.createElement("p");
+
+        empty.style.cssText =
+            "text-align:center;color:#8696a0;padding:20px";
+
+        empty.textContent = "No users found.";
+
+        list.appendChild(empty);
+
+        return;
+    }
+
+    filtered.forEach(user => {
+
+        const item = document.createElement("div");
+
+        item.className = "user";
+
+        const avatar = document.createElement("div");
+
+        avatar.className = "avatar";
+
+        avatar.textContent =
+            user.username.charAt(0).toUpperCase();
+
+        const info = document.createElement("div");
+
+        info.className = "user-info";
+
+        const name = document.createElement("strong");
+
+        name.textContent = user.username;
+
+        const subtitle = document.createElement("small");
+
+        subtitle.textContent = "Tap to chat";
+
+        info.appendChild(name);
+
+        info.appendChild(subtitle);
+
+        item.appendChild(avatar);
+
+        item.appendChild(info);
+
+        item.onclick = () => openChat(user);
+
+        list.appendChild(item);
+
+    });
+
+}
+
+
+/* =========================
+   OPEN CHAT
+========================= */
+
+async function openChat(user) {
+
+    selectedUser = user;
+
+    const version = ++chatVersion;
+
+    document.getElementById("chatName").textContent =
+        user.username;
+
+    document.getElementById("chatAvatar").textContent =
+        user.username.charAt(0).toUpperCase();
+
+    document.getElementById("app")
+        .classList.add("chat-open");
+
+    document.getElementById("messages").innerHTML = "";
+
+    if (messageChannel) {
+
+        await db.removeChannel(messageChannel);
+
+        messageChannel = null;
+
+    }
+
+    if (version !== chatVersion) return;
+
+    messageChannel = db
+        .channel("messages-" + currentUser.id + "-" + user.id)
+        .on(
+
+            "postgres_changes",
+
+            {
+                event: "INSERT",
+                schema: "public",
+                table: "messages"
+            },
+
+            payload => {
+
+                const message = payload.new;
+
+                if (!selectedUser) return;
+
+                const matches =
+                    (
+                        message.sender_id === currentUser.id &&
+                        message.receiver_id === selectedUser.id
+                    ) ||
+                    (
+                        message.sender_id === selectedUser.id &&
+                        message.receiver_id === currentUser.id
+                    );
+
+                if (matches) {
+
+                    if (!document.getElementById(
+                        "msg-" + message.id
+                    )) {
+
+                        displayMessage(message);
+
+                    }
+
+                }
+
+            }
+
+        )
+        .subscribe();
+
+    await loadMessages(version);
+
+}
+
+
+/* =========================
+   LOAD MESSAGES
+========================= */
+
+async function loadMessages(version = chatVersion) {
+
+    if (!selectedUser) return;
+
+    const friendId = selectedUser.id;
+
+    const { data, error } = await db
+        .from("messages")
+        .select("*")
+        .or(
+            `and(sender_id.eq.${currentUser.id},receiver_id.eq.${friendId}),and(sender_id.eq.${friendId},receiver_id.eq.${currentUser.id})`
+        )
+        .order("created_at", {
+            ascending: true
+        })
+        .limit(500);
+
+    if (version !== chatVersion) return;
+
+    if (error) {
+
+        console.error(error);
+
+        return;
+    }
+
+    const container =
+        document.getElementById("messages");
+
+    container.innerHTML = "";
+
+    (data || []).forEach(displayMessage);
+
+}
+
+
+/* =========================
+   DISPLAY MESSAGE
+========================= */
+
+function displayMessage(message) {
+
+    const container =
+        document.getElementById("messages");
+
+    if (document.getElementById("msg-" + message.id)) {
+        return;
+    }
+
+    const div = document.createElement("div");
+
+    div.id = "msg-" + message.id;
+
+    div.className =
+        "message " +
+        (
+            message.sender_id === currentUser.id
+            ? "sent"
+            : "received"
+        );
+
+    if (message.message_type === "text") {
+
+        const text = document.createElement("div");
+
+        text.textContent = message.content;
+
+        div.appendChild(text);
+
+    } else {
+
+        const button = document.createElement("button");
+
+        button.style.cssText =
+            "background:#25d366;padding:10px;border-radius:8px;color:#111";
+
+        const type =
+            message.message_type === "voice"
+            ? "Voice"
+            : "Video";
+
+        button.textContent =
+            "📞 Join " + type + " Call";
+
+        button.onclick = () => {
+
+            joinCall(
+                message.content,
+                message.message_type
+            );
+
+        };
+
+        div.appendChild(button);
+
+    }
+
+    const time = document.createElement("div");
+
+    time.className = "message-time";
+
+    time.textContent = new Date(
+        message.created_at
+    ).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+
+    div.appendChild(time);
+
+    container.appendChild(div);
+
+    container.scrollTop = container.scrollHeight;
+
+}
+
+
+/* =========================
+   SEND MESSAGE
+========================= */
+
+async function sendMessage() {
+
+    if (!selectedUser || !currentUser) return;
+
+    const input =
+        document.getElementById("messageText");
+
+    const text = input.value.trim();
+
+    if (!text) return;
+
+    input.value = "";
+
+    const { data, error } = await db
+        .from("messages")
+        .insert({
+
+            sender_id: currentUser.id,
+
+            receiver_id: selectedUser.id,
+
+            content: text,
+
+            message_type: "text"
+
+        })
+        .select()
+        .single();
+
+    if (error) {
+
+        alert("Message failed: " + error.message);
+
+        input.value = text;
+
+        return;
+    }
+
+    displayMessage(data);
+
+}
+
+
+/* =========================
+   START CALL
+========================= */
+
+async function startCall(type) {
+
+    if (!selectedUser) {
+
+        alert("Select a friend first.");
+
+        return;
+    }
+
+    if (typeof JitsiMeetExternalAPI === "undefined") {
+
+        alert("Jitsi Meet could not load.");
+
+        return;
+    }
+
+    // Random room for each call
+
     const room =
-        document.getElementById("roomName").value.trim();
+        "MyChat-" +
+        crypto.randomUUID().replaceAll("-", "");
 
-    if (!username || !room) {
-        alert("Please enter your name and room name.");
+    const receiverId = selectedUser.id;
+
+    const { data, error } = await db
+        .from("messages")
+        .insert({
+
+            sender_id: currentUser.id,
+
+            receiver_id: receiverId,
+
+            content: room,
+
+            message_type: type
+
+        })
+        .select()
+        .single();
+
+    if (error) {
+
+        alert("Could not send call invitation.");
+
         return;
     }
 
-    if (!/^[a-zA-Z0-9_-]+$/.test(room)) {
-        alert("Room names can only contain letters, numbers, _ and -.");
+    if (
+        selectedUser &&
+        selectedUser.id === receiverId
+    ) {
+
+        displayMessage(data);
+
+    }
+
+    joinCall(room, type);
+
+}
+
+
+/* =========================
+   JOIN JITSI CALL
+========================= */
+
+function joinCall(room, type) {
+
+    if (typeof JitsiMeetExternalAPI === "undefined") {
+
+        alert("Jitsi Meet is unavailable.");
+
         return;
     }
 
-    currentRoom = room;
+    if (!/^MyChat-[a-f0-9]{32}$/.test(room)) {
 
-    document.getElementById("joinCard").style.display = "none";
-    document.getElementById("meeting").style.display = "block";
-    document.getElementById("callControls").style.display = "block";
+        alert("Invalid call room.");
+
+        return;
+    }
+
+    if (jitsiApi) {
+
+        jitsiApi.dispose();
+
+        jitsiApi = null;
+
+    }
+
+    document.getElementById("callScreen").style.display =
+        "flex";
+
+    const container =
+        document.getElementById("jitsiContainer");
+
+    container.innerHTML = "";
 
     const options = {
-        roomName: currentRoom,
+
+        roomName: room,
 
         width: "100%",
+
         height: "100%",
 
-        parentNode: document.querySelector("#meeting"),
+        parentNode: container,
 
         userInfo: {
-            displayName: username
+
+            displayName:
+                currentUser.user_metadata.username ||
+                "MyChat User"
+
         },
 
         configOverwrite: {
-            startWithAudioMuted: false,
-            startWithVideoMuted: audioOnly,
-            prejoinPageEnabled: false
-        },
 
-        interfaceConfigOverwrite: {
-            SHOW_JITSI_WATERMARK: false
+            startWithAudioMuted: false,
+
+            startWithVideoMuted: type === "voice"
+
         }
+
     };
 
-    api = new JitsiMeetExternalAPI("meet.jit.si", options);
+    jitsiApi = new JitsiMeetExternalAPI(
+        "meet.jit.si",
+        options
+    );
 
-    if (audioOnly) {
-        api.addEventListener("videoConferenceJoined", () => {
-            api.executeCommand("toggleVideo");
-        });
-    }
+    jitsiApi.addEventListener(
+        "readyToClose",
+        endCall
+    );
 
-    api.addEventListener("readyToClose", endCall);
 }
 
-function copyLink() {
 
-    const link =
-        window.location.origin +
-        window.location.pathname +
-        "?room=" +
-        encodeURIComponent(currentRoom);
-
-    navigator.clipboard.writeText(link)
-        .then(() => alert("Invite link copied!"))
-        .catch(() => prompt("Copy this invite link:", link));
-}
+/* =========================
+   END CALL
+========================= */
 
 function endCall() {
 
-    if (api) {
-        api.dispose();
-        api = null;
+    if (jitsiApi) {
+
+        const oldApi = jitsiApi;
+
+        jitsiApi = null;
+
+        oldApi.dispose();
+
     }
 
-    document.getElementById("meeting").style.display = "none";
-    document.getElementById("meeting").innerHTML = "";
+    document.getElementById("callScreen").style.display =
+        "none";
 
-    document.getElementById("callControls").style.display = "none";
-    document.getElementById("joinCard").style.display = "block";
+    document.getElementById("jitsiContainer").innerHTML =
+        "";
+
 }
+
+
+/* =========================
+   BACK BUTTON
+========================= */
+
+function backToUsers() {
+
+    document.getElementById("app")
+        .classList.remove("chat-open");
+
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+async function logout() {
+
+    if (messageChannel) {
+
+        await db.removeChannel(messageChannel);
+
+        messageChannel = null;
+
+    }
+
+    endCall();
+
+    await db.auth.signOut();
+
+    currentUser = null;
+
+    selectedUser = null;
+
+    allUsers = [];
+
+    chatVersion++;
+
+    document.getElementById("app").style.display =
+        "none";
+
+    document.getElementById("app")
+        .classList.remove("chat-open");
+
+    document.getElementById("authScreen").style.display =
+        "flex";
+
+}
+
+
+/* =========================
+   RESTORE LOGIN
+========================= */
+
+async function checkLogin() {
+
+    const { data: { user }, error } =
+        await db.auth.getUser();
+
+    if (!error && user) {
+
+        await openApp(user);
+
+    }
+
+}
+
+
+/* =========================
+   START WEBSITE
+========================= */
+
+checkLogin();
+
 </script>
 
 </body>
